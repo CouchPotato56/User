@@ -7,6 +7,11 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: read
+  security-events: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -55,11 +60,13 @@ jobs:
           java-version: '21'
 
       - name: Initialize CodeQL
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         uses: github/codeql-action/init@v2
         with:
           languages: java
 
       - name: Perform CodeQL analysis
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         uses: github/codeql-action/analyze@v2
 
       - name: Run Snyk security scan
