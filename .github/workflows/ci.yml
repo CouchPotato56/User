@@ -62,15 +62,9 @@ jobs:
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v2
 
-      - name: Set up Snyk
-        uses: snyk/actions/setup@v3
-        with:
-          version: 'latest'
-
       - name: Run Snyk security scan
-        uses: snyk/actions/test@v2
+        uses: snyk/actions/maven@master
         with:
-          command: test
           args: --all-projects
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
