@@ -64,7 +64,21 @@ jobs:
           curl -sSL https://static.snyk.io/cli/latest/snyk-linux -o /usr/local/bin/snyk
           chmod +x /usr/local/bin/snyk
 
+      - name: Check Snyk configuration
+        id: snyk-check
+        run: |
+          if [ -z "${SNYK_TOKEN}" ]; then
+            echo "Snyk token not configured; skipping security scan."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Snyk token configured; running security scan."
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
       - name: Run Snyk security scan
+        if: steps.snyk-check.outputs.enabled == 'true'
         run: |
           export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which java))))"
           export PATH="$JAVA_HOME/bin:$PATH"
